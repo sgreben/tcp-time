@@ -20,16 +20,16 @@ Or [download the binary](https://github.com/sgreben/tcp-time/releases/latest) fr
 
 ```bash
 # Linux
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_linux_x86_64.zip
-unzip tcp-time_1.0.2_linux_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.3/tcp-time_1.0.3_linux_x86_64.zip
+unzip tcp-time_1.0.3_linux_x86_64.zip
 
 # OS X
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_osx_x86_64.zip
-unzip tcp-time_1.0.2_osx_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.3/tcp-time_1.0.3_osx_x86_64.zip
+unzip tcp-time_1.0.3_osx_x86_64.zip
 
 # Windows
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_windows_x86_64.zip
-unzip tcp-time_1.0.2_windows_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.3/tcp-time_1.0.3_windows_x86_64.zip
+unzip tcp-time_1.0.3_windows_x86_64.zip
 ```
 
 ## Use it
@@ -44,6 +44,8 @@ Usage of tcp-time:
     	Number of connections to make in parallel. (default 3)
   -b int
     	Number of histogram bins. (default 5)
+  -csv
+    	Print CSV (index,success,duration) instead of JSON
   -progress
     	Print a progress bar to stderr.
   -debug

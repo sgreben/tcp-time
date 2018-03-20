@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -20,6 +21,7 @@ type configuration struct {
 	HistogramBins int
 	Debug         bool
 	Progress      bool
+	CSV           bool
 }
 
 type output struct {
@@ -36,6 +38,7 @@ func init() {
 	flag.IntVar(&config.HistogramBins, "b", 5, "Number of histogram bins.")
 	flag.BoolVar(&config.Debug, "debug", false, "Print debug logs to stderr.")
 	flag.BoolVar(&config.Progress, "progress", false, "Print a progress bar to stderr.")
+	flag.BoolVar(&config.CSV, "csv", false, "Print CSV (index,success,duration) instead of JSON")
 	flag.Parse()
 	log.SetOutput(os.Stderr)
 	if !config.Debug {
@@ -57,6 +60,7 @@ func main() {
 
 	for i := 0; i < config.N; i++ {
 		wg.Add(1)
+		i := i
 		go func() {
 			defer wg.Done()
 			if config.Progress {
@@ -65,16 +69,28 @@ func main() {
 			limit.Acquire(ctx, 1)
 			defer limit.Release(1)
 			d, err := connectDuration(config.Target)
-			mu.Lock()
-			defer mu.Unlock()
-			output.Measurements.append(sample{
+			sample := sample{
 				Success:  err == nil,
 				Duration: d,
-			})
+			}
+			if !config.CSV {
+				mu.Lock()
+				output.Measurements.append(sample)
+				mu.Unlock()
+			} else {
+				success := 0
+				if sample.Success {
+					success = 1
+				}
+				fmt.Printf("%d,%d,%d", i, success, sample.Duration)
+				fmt.Println()
+			}
 		}()
 	}
 	wg.Wait()
-	output.Summary = output.Measurements.summary()
-	enc := json.NewEncoder(os.Stdout)
-	enc.Encode(output)
+	if !config.CSV {
+		output.Summary = output.Measurements.summary()
+		enc := json.NewEncoder(os.Stdout)
+		enc.Encode(output)
+	}
 }
