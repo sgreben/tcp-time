@@ -53,44 +53,59 @@ Usage of tcp-time:
 ## Example
 
 ```bash
-$ tcp-time -n 1000 | jq .
+$ tcp-time -target github.com:443 -n 1000 | jq .
 {
   "Measurements": [
       {
       "Valid": true,
-      "Duration": 40605393
+      "Duration": 137026172
     },
     {
       "Valid": true,
-      "Duration": 35469927
+      "Duration": 137579594
+    },
+    {
+      "Valid": true,
+      "Duration": 138099878
     },
     # ...
   ],
   "Summary": {
     "All": {
-      "Mean": 36694356.154,
-      "StdDev": 31847099.84842516,
-      "Quantiles": [ 32873052, 34962729, 36098973, 37387095, 89838530 ],
+      "Mean": 127847627.927,
+      "StdDev": 3758632.3347467924,
+      "Quantiles": [
+        117717262,
+        125723549,
+        127955884,
+        129484843,
+        159901839
+      ],
       "Histogram": [
         {
-          "Label": "32.873052ms",
-          "Value": 32873052,
-          "Count": 990
+          "Label": "117.717262ms",
+          "Value": 117717262,
+          "Count": 293
         },
         {
-          "Label": "47.114421ms",
-          "Value": 47114421,
+          "Label": "126.154177ms",
+          "Value": 126154177,
+          "Count": 684
+        },
+        {
+          "Label": "134.591093ms",
+          "Value": 134591093,
+          "Count": 20
+        },
+        {
+          "Label": "143.028008ms",
+          "Value": 143028008,
+          "Count": 1
+        },
+        {
+          "Label": "151.464924ms",
+          "Value": 151464924,
           "Count": 2
-        },
-        {
-          "Label": "61.355791ms",
-          "Value": 61355791,
-          "Count": 2
-        },
-        {
-          "Label": "75.597161ms",
-          "Value": 75597161,
-          "Count": 6
         }
       ]
     }

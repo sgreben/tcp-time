@@ -41,7 +41,7 @@ func makeDistribution(x []float64) (out distribution) {
 	for _, q := range quantiles {
 		out.Quantiles = append(out.Quantiles, stat.Quantile(q, 1, x, nil))
 	}
-	dividers := make([]float64, config.HistogramBins)
+	dividers := make([]float64, config.HistogramBins+1)
 	min := floats.Min(x)
 	max := floats.Max(x)
 	floats.Span(dividers, min, max+1)
