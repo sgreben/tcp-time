@@ -68,7 +68,7 @@ func main() {
 			mu.Lock()
 			defer mu.Unlock()
 			output.Measurements.append(sample{
-				Valid:    err == nil,
+				Success:  err == nil,
 				Duration: d,
 			})
 		}()

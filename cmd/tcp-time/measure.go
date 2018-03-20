@@ -6,7 +6,7 @@ import (
 )
 
 type sample struct {
-	Valid    bool
+	Success  bool
 	Duration time.Duration
 }
 
@@ -16,9 +16,9 @@ func (m *measurements) append(s sample) {
 	*m = append(*m, s)
 }
 
-func (m *measurements) invalidCount() (out int) {
+func (m *measurements) insuccessCount() (out int) {
 	for _, s := range *m {
-		if !s.Valid {
+		if !s.Success {
 			out++
 		}
 	}
@@ -33,10 +33,10 @@ func (m *measurements) allSeconds() []float64 {
 	return out
 }
 
-func (m *measurements) validSeconds() []float64 {
+func (m *measurements) successSeconds() []float64 {
 	out := make([]float64, 0, len(*m))
 	for _, s := range *m {
-		if s.Valid {
+		if s.Success {
 			out = append(out, float64(s.Duration))
 		}
 	}

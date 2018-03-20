@@ -25,17 +25,17 @@ func dialDuration(url string) (time.Duration, error) {
 
 func connectDuration(addr string) (time.Duration, error) {
 	var start, end time.Time
-	valid := false
+	success := false
 	trace := httptrace.ClientTrace{
 		DNSDone: func(_ httptrace.DNSDoneInfo) { start = time.Now() },
-		GotConn: func(_ httptrace.GotConnInfo) { end = time.Now(); valid = true },
+		GotConn: func(_ httptrace.GotConnInfo) { end = time.Now(); success = true },
 	}
 	ctx := httptrace.WithClientTrace(context.Background(), &trace)
 	var dialer net.Dialer
 	log.Println("connecting", addr)
 	start = time.Now()
 	conn, err := dialer.DialContext(ctx, "tcp", addr)
-	if !valid {
+	if !success {
 		end = time.Now()
 	}
 	if err == nil {

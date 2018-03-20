@@ -57,15 +57,15 @@ $ tcp-time -target github.com:443 -n 1000 | jq .
 {
   "Measurements": [
       {
-      "Valid": true,
+      "Success": true,
       "Duration": 137026172
     },
     {
-      "Valid": true,
+      "Success": true,
       "Duration": 137579594
     },
     {
-      "Valid": true,
+      "Success": true,
       "Duration": 138099878
     },
     # ...

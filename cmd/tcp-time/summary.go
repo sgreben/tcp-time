@@ -22,8 +22,8 @@ type distribution struct {
 }
 
 type summary struct {
-	All   *distribution
-	Valid *distribution `json:",omitempty"`
+	All     *distribution
+	Success *distribution `json:",omitempty"`
 }
 
 func makeDistribution(x []float64) (out distribution) {
@@ -60,9 +60,9 @@ func (m *measurements) summary() (out summary) {
 	all := makeDistribution(m.allSeconds())
 	out.All = &all
 
-	if m.invalidCount() > 0 {
-		valid := makeDistribution(m.validSeconds())
-		out.Valid = &valid
+	if m.insuccessCount() > 0 {
+		success := makeDistribution(m.successSeconds())
+		out.Success = &success
 	}
 	return
 }
