@@ -20,16 +20,16 @@ Or [download the binary](https://github.com/sgreben/tcp-time/releases/latest) fr
 
 ```bash
 # Linux
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.1/tcp-time_1.0.1_linux_x86_64.zip
-unzip tcp-time_1.0.1_linux_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_linux_x86_64.zip
+unzip tcp-time_1.0.2_linux_x86_64.zip
 
 # OS X
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.1/tcp-time_1.0.1_osx_x86_64.zip
-unzip tcp-time_1.0.1_osx_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_osx_x86_64.zip
+unzip tcp-time_1.0.2_osx_x86_64.zip
 
 # Windows
-curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.1/tcp-time_1.0.1_windows_x86_64.zip
-unzip tcp-time_1.0.1_windows_x86_64.zip
+curl -LO https://github.com/sgreben/tcp-time/releases/download/1.0.2/tcp-time_1.0.2_windows_x86_64.zip
+unzip tcp-time_1.0.2_windows_x86_64.zip
 ```
 
 ## Use it
@@ -56,7 +56,7 @@ Usage of tcp-time:
 $ tcp-time -target github.com:443 -n 1000 | jq .
 {
   "Measurements": [
-      {
+    {
       "Success": true,
       "Duration": 137026172
     },
