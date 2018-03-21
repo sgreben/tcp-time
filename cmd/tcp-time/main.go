@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/schollz/progressbar"
-	"golang.org/x/sync/semaphore"
+	"golang.org/x/time/rate"
 )
 
 type configuration struct {
@@ -19,6 +19,7 @@ type configuration struct {
 	N             int
 	Parallel      int
 	HistogramBins int
+	RateLimit     float64
 	Debug         bool
 	Progress      bool
 	CSV           bool
@@ -32,11 +33,14 @@ type output struct {
 }
 
 var config configuration
+var out output
+var csvFile *os.File
 
 func init() {
-	flag.StringVar(&config.Target, "target", "duckduckgo.com:443", "host:port to ping.")
-	flag.IntVar(&config.N, "n", 10, "Number of pings to make.")
-	flag.IntVar(&config.Parallel, "p", 3, "Number of pings to make in parallel.")
+	flag.StringVar(&config.Target, "target", "duckduckgo.com:443", "host:port to connect to.")
+	flag.IntVar(&config.N, "n", 10, "Number of connections to make.")
+	flag.Float64Var(&config.RateLimit, "rate-limit", 0.0, "Rate limit (connections per second) to apply.")
+	flag.IntVar(&config.Parallel, "p", 3, "Number of connections to make in parallel.")
 	flag.IntVar(&config.HistogramBins, "b", 5, "Number of histogram bins.")
 	flag.BoolVar(&config.Debug, "debug", false, "Print debug logs to stderr.")
 	flag.BoolVar(&config.Progress, "progress", false, "Print a progress bar to stderr.")
@@ -49,10 +53,35 @@ func init() {
 	}
 }
 
+func worker(wg *sync.WaitGroup, mu *sync.Mutex, work chan int) {
+	wg.Add(1)
+	defer wg.Done()
+	for i := range work {
+		d, err := connectDuration(config.Target)
+		sample := sample{
+			Success:  err == nil,
+			Duration: d,
+		}
+		success := 0
+		if sample.Success {
+			success = 1
+		}
+		if !config.CSV {
+			mu.Lock()
+			out.Measurements.append(sample)
+			mu.Unlock()
+		} else {
+			fmt.Printf("%d,%d,%d", i, success, sample.Duration)
+			fmt.Println()
+		}
+		if csvFile != nil {
+			fmt.Fprintf(csvFile, "%d,%d,%d", i, success, sample.Duration)
+			fmt.Fprintln(csvFile)
+		}
+	}
+}
+
 func main() {
-	var output output
-	var csvFile *os.File
-	limit := semaphore.NewWeighted(int64(config.Parallel))
 	var bar *progressbar.ProgressBar
 	if config.Progress {
 		bar = progressbar.New(config.N)
@@ -69,45 +98,36 @@ func main() {
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	ctx := context.Background()
+	var limiter *rate.Limiter
+
+	if config.RateLimit > 0 {
+		limiter = rate.NewLimiter(rate.Limit(config.RateLimit), 1)
+	}
+
+	work := make(chan int, config.Parallel)
+
+	for i := 0; i < config.Parallel; i++ {
+		go worker(&wg, &mu, work)
+	}
 
 	for i := 0; i < config.N; i++ {
-		wg.Add(1)
-		i := i
-		go func() {
-			defer wg.Done()
-			if config.Progress {
-				defer bar.Add(1)
+		if limiter != nil {
+			err := limiter.Wait(ctx)
+			if err != nil {
+				log.Println(err)
 			}
-			limit.Acquire(ctx, 1)
-			defer limit.Release(1)
-			d, err := connectDuration(config.Target)
-			sample := sample{
-				Success:  err == nil,
-				Duration: d,
-			}
-			success := 0
-			if sample.Success {
-				success = 1
-			}
-			if !config.CSV {
-				mu.Lock()
-				output.Measurements.append(sample)
-				mu.Unlock()
-			} else {
-				fmt.Printf("%d,%d,%d", i, success, sample.Duration)
-				fmt.Println()
-			}
-			if csvFile != nil {
-				fmt.Fprintf(csvFile, "%d,%d,%d", i, success, sample.Duration)
-				fmt.Fprintln(csvFile)
-			}
-		}()
+		}
+		work <- i
+		if config.Progress {
+			bar.Add(1)
+		}
 	}
+	close(work)
 	wg.Wait()
 	if !config.CSV {
-		output.Configuration = config
-		output.Summary = output.Measurements.summary()
+		out.Configuration = config
+		out.Summary = out.Measurements.summary()
 		enc := json.NewEncoder(os.Stdout)
-		enc.Encode(output)
+		enc.Encode(out)
 	}
 }

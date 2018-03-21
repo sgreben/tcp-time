@@ -51,13 +51,13 @@
 
 [[projects]]
   branch = "master"
-  name = "golang.org/x/sync"
-  packages = ["semaphore"]
-  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+  name = "golang.org/x/time"
+  packages = ["rate"]
+  revision = "26559e0f760e39c24d730d3224364aef164ee23f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "49742e53614ea93480c9549bfb3f860e0d3317f511e54ef6eacd82a43a111c59"
+  inputs-digest = "a4ae89ec22fac7a392b7f92d8cfe5033942137fa06a38edde41811d6ee4bb827"
   solver-name = "gps-cdcl"
   solver-version = 1
